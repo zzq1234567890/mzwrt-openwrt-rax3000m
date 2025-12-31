@@ -20,7 +20,7 @@
 5. 准备好 U-Boot 固件：
    - `U-boot.bin` [下载链接](https://drive.wrt.moe/uboot/mediatek)
 
-本页面也提供了所有文件，是基于openwrt官方的文件用于救砖
+本页面也提供了所有文件，是基于openwrt官方的文件用于救砖，**mtd1_BL2.bin**是官方备份出来的，**preloader**是openwrt官方文件
 
 ### 固件文件解释
 
