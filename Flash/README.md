@@ -22,7 +22,7 @@
    - `recovery.itb`
    - `sysupgrade.itb`
 5. 准备好 U-Boot 固件：
-   - `U-boot.bin` <a href="https://drive.wrt.moe/uboot/mediatek" target="_blank" target="_blank">下载链接</a>
+   - `U-boot.bin` <a target="_blank" href="https://drive.wrt.moe/uboot/mediatek" target="_blank">下载链接</a>
 
 本页面也提供了所有文件，是基于openwrt官方的文件用于救砖，**mtd1_BL2.bin**是官方备份出来的，**preloader**是openwrt官方文件
 
