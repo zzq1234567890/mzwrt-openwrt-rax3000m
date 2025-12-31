@@ -13,17 +13,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     
-    - name: Checkout private repository
-      uses: actions/checkout@v3
-      with:
-        repository: 'mzwrt/config'
-        token: ${{ secrets.GH_TOKEN }}
-        ref: 'main'
-      
-    - name: Move repo to /mnt/openwrt
-      run: |
-        mv ./mzwrt-openwrt /mnt/openwrt/
-    
     # 1. Clone Repository
     - name: Clone Repository
       uses: actions/checkout@v4
@@ -39,6 +28,17 @@ jobs:
           sudo mount /dev/$largest_disk /mnt/openwrt
           df -h /mnt/openwrt
           echo "/dev/$largest_disk /mnt/openwrt ext4 defaults 0 2" | sudo tee -a /etc/fstab
+
+    - name: Checkout private repository
+      uses: actions/checkout@v3
+      with:
+        repository: 'mzwrt/config'
+        token: ${{ secrets.GH_TOKEN }}
+        ref: 'main'
+      
+    - name: Move repo to /mnt/openwrt
+      run: |
+        mv ./mzwrt-openwrt /mnt/openwrt/
 
     # 3. Initialization environment
     - name: Initialization environment
