@@ -149,6 +149,12 @@ jobs:
         ./scripts/feeds install -a
         cp -f ../mzwrt-openwrt/diy2.sh ./
         # chmod +x ./diy2.sh && ./diy2.sh
+        #=================================================
+        cat package/feeds/packages/rust/Makefile
+        #=================================================
+
+        cat feeds/packages/lang/rust/Makefile
+        #=================================================   
 
     # 6. Configuration Customization
     - name: Configuration Customization - Build_mt7981_rax3000m
