@@ -104,6 +104,16 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
+    - name: Set environment variables
+      run: |
+        echo "LLVM_CI_LLVM=false" >> $GITHUB_ENV
+
+    - name: Set up Rust
+      uses: actions/setup-rust@v1
+      with:
+        rust-version: 1.89.0
+
+
     # 8. Build firmware
     - name: Build firmware
       working-directory: /mnt/openwrt/openwrt
