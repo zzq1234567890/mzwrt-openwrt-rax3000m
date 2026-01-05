@@ -50,11 +50,45 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         echo "======================="
-        sudo rm /var/lib/apt/lists/lock
-        sudo rm /var/cache/apt/archives/lock
-        sudo rm /var/lib/dpkg/lock*
         echo "======================="
-        sudo apt-get remove --purge -yqq llvm* clang* lld* llvm-dev libclang* libllvm* liblld* clang-format gcc* g++* build-essential rustc cargo make cmake autoconf automake pkg-config
+        sudo apt-get remove --purge -yqq llvm
+        echo "======================="
+
+        sudo apt-get remove --purge -yqq clang
+        echo "======================="
+        sudo apt-get remove --purge -yqq lld
+        echo "======================="
+        sudo apt-get remove --purge -yqq llvm-dev
+        echo "======================="
+        sudo apt-get remove --purge -yqq libclang
+        echo "======================="
+        sudo apt-get remove --purge -yqq libllvm
+        echo "======================="
+        sudo apt-get remove --purge -yqq liblld
+        echo "======================="
+        sudo apt-get remove --purge -yqq clang-format
+        echo "======================="
+        sudo apt-get remove --purge -yqq gcc
+        echo "======================="
+        sudo apt-get remove --purge -yqq g++
+        echo "======================="
+        sudo apt-get remove --purge -yqq build-essential
+        echo "======================="
+        sudo apt-get remove --purge -yqq rustc
+        echo "======================="
+        sudo apt-get remove --purge -yqq cargo
+        echo "======================="
+        sudo apt-get remove --purge -yqq make
+        echo "======================="
+        sudo apt-get remove --purge -yqq cmake
+        echo "======================="
+        sudo apt-get remove --purge -yqq autoconf
+        echo "======================="
+        sudo apt-get remove --purge -yqq automake
+        echo "======================="
+        sudo apt-get remove --purge -yqq pkg-config
+        echo "======================="
+
         sudo apt-get update
         sudo apt-get -yqq upgrade
         sudo apt-get -yqq full-upgrade
