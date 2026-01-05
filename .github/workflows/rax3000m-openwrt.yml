@@ -110,8 +110,8 @@ jobs:
         sudo apt-get -yqq autoremove --purge
 
         echo "======================="
-        sudo apt-get remove --purge -yqq autoconf
-        sudo apt-get -yqq autoremove --purge
+        #sudo apt-get remove --purge -yqq autoconf
+        #sudo apt-get -yqq autoremove --purge
 
         echo "======================="
         sudo apt-get remove --purge -yqq automake
