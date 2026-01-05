@@ -1,6 +1,6 @@
 # CMCC RAX3000M NAND OpenWrt 刷机指南
 
-本指南面向 **NAND EMMC 版 CMCC RAX3000M 路由器**，假设已经刷入了 H 大 U-Boot。通过四个步骤，即可成功刷入固件。
+本指南面向 **NAND CMCC RAX3000M 路由器**，假设已经刷入了 H 大 U-Boot。通过四个步骤，即可成功刷入固件。
 
 
 
