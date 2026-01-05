@@ -126,7 +126,7 @@ jobs:
         sudo apt-get install -yqq build-essential python3-setuptools liblua5.1-0 libtool-bin libcrypto++-dev libpcre3 libpcre3-dev libpcre3 libpcre3-dev python3-pip python3-socks python3-socks python3-unidecode 
         sudo systemctl daemon-reload
         sudo timedatectl set-timezone "Asia/Shanghai"
-        git config --global user.name 'GitHub Actions' && git config --global user.email 'your-email@example.com'
+        git config --global user.name 'GitHub Actions' && git config --global user.email '${{ secrets.GH_MAIL }}'
 
     # 4. Clone source code
     - name: Clone source code
