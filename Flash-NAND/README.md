@@ -15,9 +15,9 @@
 ## 准备工作 （仔细阅读！）
 
 1. 路由器为 **NAND 版本**。
-2. 已刷入 **H 大 U-Boot**。
+2. 已刷入 **H 大 U-Boot** 或 刷入其他 U-boot
 3. 浏览器和电脑在同一网络，浏览器可访问 `192.168.1.1`。
-4. 下载 OpenWrt 官方提供的以下固件：
+4. 下载提供的以下固件：
    - `preloader.bin`
    - `recovery.itb`
    - `sysupgrade.itb`
@@ -40,14 +40,12 @@
 ---
 
 ## 刷机步骤
-> ⚠️ **注意**：这个是 NAND 版 如果是EMMC版本多一个步骤，在步骤一之前进U-boot后访问 <a href="http://192.168.1.1/gpt.html" target="_blank">http://192.168.1.1/gpt.html</a> 然后刷入EMMC-GPT.bin后再继续按照步骤一继续操作即可
-### **步骤 1：刷 Preloader**
 
 1. 路由器按 **复位键** 进入 U-Boot。
 2. 在浏览器中访问：
 <a href="http://192.168.1.1/bl2.html" target="_blank">http://192.168.1.1/bl2.html</a>
 
-3. 刷入 **OpenWrt 官方 preloader.bin** 文件。
+3. 刷入 ** preloader.bin** 文件。
 4. 完成后，路由器重启进入 U-Boot。
 
 ---
@@ -63,9 +61,10 @@
 ---
 
 ### **步骤 3：刷 Recovery**
-
-1. 在新的 U-Boot 中，刷入 **OpenWrt 官方 recovery.itb** 文件。
-2. 完成后，路由器启动进入 **OpenWrt 恢复模式**。
+> ⚠️ **注意**：下面还有一步，能进后台不代表就可以食用了！！
+1. 在新的 U-Boot 中，刷入 ** recovery.itb** 文件。
+2. 完成后，路由器启动进入 ** 恢复模式**。
+   
 
 ---
 
