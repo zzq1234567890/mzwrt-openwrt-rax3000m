@@ -17,11 +17,12 @@
 
 1. 路由器为 **NAND 版本**。
 2. 已刷入 **H 大 U-Boot** 或 刷入其他 U-boot 
-3. 浏览器和电脑在同一网络，浏览器可访问 `192.168.1.1`
+3. 请到<a target="_blank" href="https://github.com/mzwrt/mzwrt-openwrt/releases" target="_blank">发布页</a>下载以下三个文件
 4. 下载提供的以下固件：
    - `MzWrt-mediatek-filogic-cmcc_rax3000m-nand-preloader.bin`
    - `MzWrt-mediatek-filogic-cmcc_rax3000m-initramfs-recovery.itb`
    - `MzWrt-mediatek-filogic-cmcc_rax3000m-squashfs-sysupgrade.itb`
+
 5. 准备好 U-Boot 固件：
    - `U-boot.bin` <a target="_blank" href="https://drive.wrt.moe/uboot/mediatek" target="_blank">下载链接</a>
 - **`下文称呼都以结尾单词进行称呼不再称呼全称`**  
