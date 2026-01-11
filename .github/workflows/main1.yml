@@ -56,28 +56,28 @@ jobs:
                 "rax3000m.config")
                   # 創建基本配置
                   cat > "${{ env.CONFIG_DIR }}/rax3000m.config" << 'EOF'
-CONFIG_TARGET_mediatek=y
-CONFIG_TARGET_mediatek_filogic=y
-CONFIG_TARGET_mediatek_filogic_DEVICE_cmcc_rax3000m=y
-EOF
+         CONFIG_TARGET_mediatek=y
+         CONFIG_TARGET_mediatek_filogic=y
+         CONFIG_TARGET_mediatek_filogic_DEVICE_cmcc_rax3000m=y
+         EOF
                   ;;
                 "diy1.sh")
                   cat > "${{ env.CONFIG_DIR }}/diy1.sh" << 'EOF'
-#!/bin/bash
-echo "執行 diy1.sh - 初始配置"
-# 添加自訂源
-# sed -i 's/src-git packages/# src-git packages/g' feeds.conf.default
-# echo "src-git packages https://github.com/openwrt/packages.git" >> feeds.conf.default
-EOF
+        #!/bin/bash
+        echo "執行 diy1.sh - 初始配置"
+         # 添加自訂源
+        # sed -i 's/src-git packages/# src-git packages/g' feeds.conf.default
+        # echo "src-git packages https://github.com/openwrt/packages.git" >> feeds.conf.default
+        EOF
                   chmod +x "${{ env.CONFIG_DIR }}/diy1.sh"
                   ;;
                 "diy2.sh")
                   cat > "${{ env.CONFIG_DIR }}/diy2.sh" << 'EOF'
-#!/bin/bash
-echo "執行 diy2.sh - Feeds 後配置"
-# 安裝額外包
-# ./scripts/feeds install luci-app-adbyby-plus
-EOF
+        #!/bin/bash
+        echo "執行 diy2.sh - Feeds 後配置"
+        # 安裝額外包
+        # ./scripts/feeds install luci-app-adbyby-plus
+        EOF
                   chmod +x "${{ env.CONFIG_DIR }}/diy2.sh"
                   ;;
               esac
