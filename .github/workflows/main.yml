@@ -3,38 +3,263 @@ name: Build_mt7981_rax3000m
 on: 
   repository_dispatch:
   workflow_dispatch:
-
-  # 定时触发编译
   schedule:
     - cron: '0 21 * * 5'
 
 jobs:
   Build_mt7981_rax3000m:
     runs-on: ubuntu-latest
-    steps:
-    - name: Get Actions Count
-      run: |
-          actions_count=$(gh run list --limit 10 --json status | grep "completed" | wc -l)
-          echo "Actions count: $actions_count"
     
-    # 1. Clone Repository
-    - name: Clone Repository
-      uses: actions/checkout@v4
-
-    # 2. Find and mount largest disk
-    - name: Find and mount largest disk
+    # 添加環境變數
+    env:
+      WORK_DIR: /mnt/openwrt
+      CONFIG_DIR: /mnt/openwrt/config-files
+    
+    steps:
+    # 1. 檢查可用磁盤
+    - name: Check available disks
       run: |
-          df -h
-          largest_disk=$(lsblk -o NAME,SIZE,MOUNTPOINT | grep -vE 'MOUNTPOINT|/dev/loop' | sort -k2 -h | tail -n 1 | awk '{print $1}' | sed 's/^[^a-zA-Z0-9]*//g')
-          echo "Largest disk is /dev/$largest_disk"
-          sudo mkdir -p /mnt/openwrt
-          sudo chown -R $USER:$USER /mnt/openwrt
-          sudo mount /dev/$largest_disk /mnt/openwrt
-          df -h /mnt/openwrt
-          echo "/dev/$largest_disk /mnt/openwrt ext4 defaults 0 2" | sudo tee -a /etc/fstab
-
-    - name: Checkout config repository (public)
+        echo "可用磁盤空間:"
+        df -h
+        echo "磁盤列表:"
+        lsblk
+        
+    # 2. 準備工作目錄
+    - name: Prepare workspace
       run: |
+        # 使用臨時目錄而不是 /mnt
+        mkdir -p /tmp/openwrt-build
+        echo "WORK_DIR=/tmp/openwrt-build" >> $GITHUB_ENV
+        echo "CONFIG_DIR=/tmp/openwrt-build/config-files" >> $GITHUB_ENV
+        
+    # 3. 複製配置文件
+    - name: Copy configuration files
+      run: |
+        mkdir -p ${{ env.CONFIG_DIR }}
+        
+        # 檢查當前倉庫是否有配置文件
+        echo "檢查配置文件..."
+        
+        # 如果當前倉庫有 config 文件夾
+        if [ -d "./config" ]; then
+          echo "使用當前倉庫的配置文件"
+          cp -r ./config/* ${{ env.CONFIG_DIR }}/
+        # 如果文件在根目錄
+        else
+          for file in rax3000m.config diy1.sh diy2.sh; do
+            if [ -f "./$file" ]; then
+              echo "找到 $file"
+              cp "./$file" ${{ env.CONFIG_DIR }}/
+            else
+              echo "警告: 未找到 $file"
+              # 創建簡單的配置文件
+              case $file in
+                "rax3000m.config")
+                  # 創建基本配置
+                  cat > "${{ env.CONFIG_DIR }}/rax3000m.config" << 'EOF'
+CONFIG_TARGET_mediatek=y
+CONFIG_TARGET_mediatek_filogic=y
+CONFIG_TARGET_mediatek_filogic_DEVICE_cmcc_rax3000m=y
+EOF
+                  ;;
+                "diy1.sh")
+                  cat > "${{ env.CONFIG_DIR }}/diy1.sh" << 'EOF'
+#!/bin/bash
+echo "執行 diy1.sh - 初始配置"
+# 添加自訂源
+# sed -i 's/src-git packages/# src-git packages/g' feeds.conf.default
+# echo "src-git packages https://github.com/openwrt/packages.git" >> feeds.conf.default
+EOF
+                  chmod +x "${{ env.CONFIG_DIR }}/diy1.sh"
+                  ;;
+                "diy2.sh")
+                  cat > "${{ env.CONFIG_DIR }}/diy2.sh" << 'EOF'
+#!/bin/bash
+echo "執行 diy2.sh - Feeds 後配置"
+# 安裝額外包
+# ./scripts/feeds install luci-app-adbyby-plus
+EOF
+                  chmod +x "${{ env.CONFIG_DIR }}/diy2.sh"
+                  ;;
+              esac
+            fi
+          done
+        fi
+        
+        echo "配置文件準備完成:"
+        ls -la ${{ env.CONFIG_DIR }}
+
+    # 4. 初始化環境
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt-get install -yqq \
+          build-essential \
+          ccache \
+          file \
+          gawk \
+          gettext \
+          git \
+          libncurses5-dev \
+          libssl-dev \
+          python3 \
+          python3-distutils \
+          rsync \
+          unzip \
+          wget \
+          zlib1g-dev
+        
+        # 安裝 OpenWRT 編譯所需套件
+        sudo apt-get install -yqq \
+          subversion \
+          g++ \
+          gcc \
+          binutils \
+          patch \
+          bzip2 \
+          flex \
+          make \
+          autoconf \
+          automake \
+          libtool \
+          sed \
+          bc \
+          tar \
+          bash \
+          help2man \
+          bison \
+          gcc-multilib \
+          g++-multilib
+        
+        # 設置時區
+        sudo timedatectl set-timezone "Asia/Shanghai"
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+
+    # 5. 克隆 OpenWRT 源碼
+    - name: Clone OpenWRT source
+      working-directory: ${{ env.WORK_DIR }}
+      run: |
+        git clone -b v24.10.5 --single-branch --depth=1 https://github.com/openwrt/openwrt.git openwrt
+        cd openwrt
+        
+        # 複製並執行 diy1.sh
+        if [ -f "${{ env.CONFIG_DIR }}/diy1.sh" ]; then
+          cp -f "${{ env.CONFIG_DIR }}/diy1.sh" ./
+          chmod +x ./diy1.sh
+          ./diy1.sh
+        else
+          echo "警告: 未找到 diy1.sh"
+        fi
+
+    # 6. 更新和安裝 feeds
+    - name: Update & Install feeds
+      working-directory: ${{ env.WORK_DIR }}/openwrt
+      run: |
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        
+        # 複製並執行 diy2.sh
+        if [ -f "${{ env.CONFIG_DIR }}/diy2.sh" ]; then
+          cp -f "${{ env.CONFIG_DIR }}/diy2.sh" ./
+          chmod +x ./diy2.sh
+          ./diy2.sh
+        else
+          echo "警告: 未找到 diy2.sh"
+        fi
+
+    # 7. 配置編譯
+    - name: Configuration
+      working-directory: ${{ env.WORK_DIR }}/openwrt
+      run: |
+        echo "開始配置..."
+        
+        # 使用配置文件
+        if [ -f "${{ env.CONFIG_DIR }}/rax3000m.config" ]; then
+          cp -f "${{ env.CONFIG_DIR }}/rax3000m.config" ./.config
+          echo "使用自訂配置文件"
+        else
+          echo "錯誤: 未找到配置文件"
+          exit 1
+        fi
+        
+        make defconfig
+
+    # 8-12. 保持原有步驟不變，但更新路徑...
+    # 8. Download package
+    - name: Download package
+      working-directory: ${{ env.WORK_DIR }}/openwrt
+      run: |
+        echo "磁盤空間使用情況:"
+        df -h
+        echo "開始下載套件..."
+        make download -j$(nproc)
+        # 清理過小的文件
+        find dl -size -1024c -delete 2>/dev/null || true
+
+    # 9. 編譯固件
+    - name: Build firmware
+      working-directory: ${{ env.WORK_DIR }}/openwrt
+      timeout-minutes: 120
+      run: |
+        echo "開始編譯，使用 $(nproc) 個核心..."
+        make -j$(nproc) || make -j1 V=s
+        echo "編譯完成！"
+
+    # 10. 生成發布名稱
+    - name: Generate release info
+      id: release_info
+      run: |
+        RELEASE_TAG=$(date +%Y%m%d%H%M%S)
+        RELEASE_NAME="MzWrt-CMCC-RAX3000M-$(date +%Y%m%d)"
+        echo "tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+        echo "name=$RELEASE_NAME" >> $GITHUB_OUTPUT
+
+    # 11. 準備固件文件
+    - name: Prepare firmware files
+      working-directory: ${{ env.WORK_DIR }}/openwrt
+      run: |
+        TARGET_DIR="./bin/targets/mediatek/filogic"
+        
+        # 壓縮 packages 目錄
+        if [ -d "$TARGET_DIR/packages" ]; then
+          tar -czf "$TARGET_DIR/packages.tar.gz" -C "$TARGET_DIR" packages
+          rm -rf "$TARGET_DIR/packages"
+        fi
+        
+        # 重命名文件
+        for file in "$TARGET_DIR"/openwrt*; do
+          if [ -f "$file" ]; then
+            new_name=$(echo "$file" | sed 's/openwrt/MzWrt/g')
+            mv "$file" "$new_name"
+            echo "重命名: $(basename "$file") -> $(basename "$new_name")"
+          fi
+        done
+        
+        echo "最終文件:"
+        ls -la "$TARGET_DIR/"
+
+    # 12. 上傳構件
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CMCC-RAX3000M-MzWrt
+        path: ${{ env.WORK_DIR }}/openwrt/bin/targets/mediatek/filogic/*.{bin,tar.gz}
+
+    # 13. 創建發布（可選）
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        name: ${{ steps.release_info.outputs.name }}
+        tag_name: ${{ steps.release_info.outputs.tag }}
+        files: ${{ env.WORK_DIR }}/openwrt/bin/targets/mediatek/filogic/*.{bin,tar.gz}
+        body: |
+          CMCC RAX3000M OpenWRT 固件
+          編譯時間: $(date)
+          OpenWRT 版本: v24.10.5      run: |
         # 尝试克隆公开配置仓库
         if git clone https://github.com/mzwrt/config.git /tmp/mzwrt-config; then
           echo "Successfully cloned public config repository"
