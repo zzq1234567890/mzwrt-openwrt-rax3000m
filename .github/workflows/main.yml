@@ -56,10 +56,10 @@ jobs:
                 "rax3000m.config")
                   # 創建基本配置
                   cat > "${{ env.CONFIG_DIR }}/rax3000m.config" << 'EOF'
-CONFIG_TARGET_mediatek=y
-CONFIG_TARGET_mediatek_filogic=y
-CONFIG_TARGET_mediatek_filogic_DEVICE_cmcc_rax3000m=y
-EOF
+          CONFIG_TARGET_mediatek=y
+          CONFIG_TARGET_mediatek_filogic=y
+          CONFIG_TARGET_mediatek_filogic_DEVICE_cmcc_rax3000m=y
+           EOF
                   ;;
                 "diy1.sh")
                   cat > "${{ env.CONFIG_DIR }}/diy1.sh" << 'EOF'
