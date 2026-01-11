@@ -63,21 +63,21 @@ jobs:
                   ;;
                 "diy1.sh")
                   cat > "${{ env.CONFIG_DIR }}/diy1.sh" << 'EOF'
-#!/bin/bash
-echo "執行 diy1.sh - 初始配置"
-# 添加自訂源
-# sed -i 's/src-git packages/# src-git packages/g' feeds.conf.default
-# echo "src-git packages https://github.com/openwrt/packages.git" >> feeds.conf.default
-EOF
+        #!/bin/bash
+        echo "執行 diy1.sh - 初始配置"
+        # 添加自訂源
+        # sed -i 's/src-git packages/# src-git packages/g' feeds.conf.default
+        # echo "src-git packages https://github.com/openwrt/packages.git" >> feeds.conf.default
+        EOF
                   chmod +x "${{ env.CONFIG_DIR }}/diy1.sh"
                   ;;
                 "diy2.sh")
                   cat > "${{ env.CONFIG_DIR }}/diy2.sh" << 'EOF'
-#!/bin/bash
-echo "執行 diy2.sh - Feeds 後配置"
-# 安裝額外包
-# ./scripts/feeds install luci-app-adbyby-plus
-EOF
+         #!/bin/bash
+         echo "執行 diy2.sh - Feeds 後配置"
+         # 安裝額外包
+         # ./scripts/feeds install luci-app-adbyby-plus
+         EOF
                   chmod +x "${{ env.CONFIG_DIR }}/diy2.sh"
                   ;;
               esac
